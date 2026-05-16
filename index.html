@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RepurseAI – AI Content Repurposer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --surface2: #181818;
+      --border: #222222;
+      --accent: #e8441a;
+      --accent2: #ff6b3d;
+      --text: #f0f0f0;
+      --muted: #888888;
+      --white: #ffffff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* NOISE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* HEADER */
+    header {
+      position: relative;
+      z-index: 1;
+      padding: 2rem 2rem 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: var(--white);
+      text-transform: uppercase;
+    }
+
+    .logo span { color: var(--accent); }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 5rem 2rem 3rem;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(232, 68, 26, 0.12);
+      border: 1px solid rgba(232, 68, 26, 0.3);
+      color: var(--accent2);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      margin-bottom: 0.3rem;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+      display: block;
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--muted);
+      margin: 1.5rem auto 0;
+      max-width: 540px;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    /* SOCIAL MEDIA IMAGE */
+    .social-img-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+      margin: 3rem auto 0;
+      padding: 0 2rem;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .social-img-wrap img {
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    }
+
+    /* VIDEO */
+    .video-section {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 4rem auto 0;
+      padding: 0 2rem;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+
+    .video-label {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .video-wrap {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-bottom: 51.719%;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+    }
+
+    .video-wrap iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
+
+    /* BENEFITS */
+    .benefits-section {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+      margin: 5rem auto 0;
+      padding: 0 2rem;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--white);
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .benefits-grid { grid-template-columns: 1fr; }
+    }
+
+    .benefit-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem 1.4rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .benefit-card:hover {
+      border-color: rgba(232, 68, 26, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .benefit-dot {
+      width: 8px;
+      height: 8px;
+      min-width: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 7px;
+    }
+
+    .benefit-text {
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .benefit-text strong {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    /* PRICING */
+    .pricing-section {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 5rem auto 0;
+      padding: 0 2rem;
+      text-align: center;
+    }
+
+    .pricing-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pricing-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+
+    .launch-badge {
+      display: inline-block;
+      background: rgba(232, 68, 26, 0.15);
+      border: 1px solid rgba(232, 68, 26, 0.35);
+      color: var(--accent2);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+    }
+
+    .price-regular {
+      font-size: 1rem;
+      color: var(--muted);
+      text-decoration: line-through;
+      margin-bottom: 0.3rem;
+    }
+
+    .price-main {
+      font-family: 'Syne', sans-serif;
+      font-size: 4rem;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    .price-main sup {
+      font-size: 1.8rem;
+      vertical-align: super;
+      color: var(--accent);
+    }
+
+    .price-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    .buy-btn-wrap {
+      margin-top: 1.5rem;
+    }
+
+    .buy-btn-wrap a img {
+      max-width: 100%;
+      height: auto;
+      transition: transform 0.2s, filter 0.2s;
+    }
+
+    .buy-btn-wrap a:hover img {
+      transform: scale(1.03);
+      filter: brightness(1.1);
+    }
+
+    .guarantee {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 1.2rem;
+    }
+
+    /* API NOTE */
+    .api-note {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      margin: 2.5rem auto 0;
+      padding: 0 2rem;
+      text-align: center;
+    }
+
+    .api-note-inner {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.2rem 1.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .api-note-inner strong { color: var(--text); }
+
+    .api-note-inner a {
+      color: var(--accent2);
+      text-decoration: none;
+    }
+
+    .api-note-inner a:hover { text-decoration: underline; }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 4rem 2rem 3rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    /* DISCLAIMER */
+    .wplus_spdisclaimer {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* GLOW */
+    .glow {
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(232,68,26,0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="glow"></div>
+
+<header>
+  <div class="logo">Repurse<span>AI</span></div>
+</header>
+
+<section class="hero">
+  <div class="hero-badge">🔥 Launch Special — Limited Time</div>
+  <h1>RepurseAI <span>AI Content Repurposer</span></h1>
+  <p class="hero-sub">Turn any blog post, article, or script into ready-to-publish content for 12 platforms in seconds — one-time payment, no subscriptions, ever.</p>
+</section>
+
+<div class="social-img-wrap">
+  <img src="https://i.postimg.cc/Jzj5KRyq/Social-Media-Icons-Edited.jpg" alt="Supported social media platforms" />
+</div>
+
+<div class="video-section">
+  <div class="video-label">▶ See it in action</div>
+  <div class="video-wrap">
+    <iframe allow="fullscreen;autoplay" allowfullscreen
+      src="https://streamable.com/e/iprcq0?autoplay=1&muted=1&nocontrols=1">
+    </iframe>
+  </div>
+</div>
+
+<section class="benefits-section">
+  <h2 class="section-title">Everything You Get</h2>
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <div class="benefit-dot"></div>
+      <div class="benefit-text"><strong>12 Platforms, One Click</strong> — Repurpose any content instantly with no copy-pasting or rewriting</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-dot"></div>
+      <div class="benefit-text"><strong>One-Time Payment</strong> — No subscriptions, no recurring fees. Yours forever.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-dot"></div>
+      <div class="benefit-text"><strong>Your Own OpenAI Key</strong> — Pay only pennies per use, not $30/month to another SaaS</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-dot"></div>
+      <div class="benefit-text"><strong>Tone & Creativity Control</strong> — Match your exact brand voice every single time</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-dot"></div>
+      <div class="benefit-text"><strong>Choose Your AI Model</strong> — Balance speed and cost based on your needs</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-dot"></div>
+      <div class="benefit-text"><strong>Custom "Don'ts"</strong> — Tell the AI exactly what to avoid in every output</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-dot"></div>
+      <div class="benefit-text"><strong>Clean Desktop App</strong> — No browser, no login, no internet except for API calls</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-dot"></div>
+      <div class="benefit-text"><strong>Windows Ready</strong> — Lightweight, no GPU needed, runs on any PC</div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing-section">
+  <div class="pricing-card">
+    <div class="launch-badge">🚀 Launch Price</div>
+    <div class="price-regular">Regular Price: $19.99</div>
+    <div class="price-main"><sup>$</sup>8<sup>.99</sup></div>
+    <div class="price-note">One-time payment — no monthly fees</div>
+    <div class="buy-btn-wrap">
+      <a href="https://warriorplus.com/o2/buy/cgpmlc/k61n1n/gwb13y">
+        <img src="https://warriorplus.com/o2/btn/fn120011010/cgpmlc/k61n1n/464334" alt="Buy Now" />
+      </a>
+    </div>
+    <div class="guarantee">🔒 Secure checkout via WarriorPlus</div>
+  </div>
+</section>
+
+<div class="api-note">
+  <div class="api-note-inner">
+    <strong>💡 About the OpenAI API Key:</strong> RepurseAI uses your own OpenAI key — 1,000 repurposing tasks cost roughly $1–2. No hidden costs.
+    <a href="https://www.youtube.com/results?search_query=how+to+get+openai+api+key" target="_blank">Watch how to get your key →</a>
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 7Codes - RepurseAI. All rights reserved.</p>
+  <p style="margin-top: 0.5rem; font-size: 0.78rem;">
+    <a href="mailto:emailzenythos@gmail.com" style="color: var(--accent2); text-decoration: none;">Email Us</a>
+    &nbsp;·&nbsp;
+    <a href="https://sites.google.com/view/7codes" style="color: var(--accent2); text-decoration: none;">Privacy Policy</a>
+  </p>
+</footer>
+
+<div class="wplus_spdisclaimer"></div>
+<script type="text/javascript" src="https://warriorplus.com/o2/disclaimer/cgpmlc" defer></script>
+
+
+</body>
+</html>
